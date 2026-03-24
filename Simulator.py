@@ -32,6 +32,7 @@ class SimulatorObjects:
     GPS_LONGITUDE = 0.0
     GPS_SATS = 0
     CMD_ECHO = "CXON"
+    TX_ENABLED = True
 
    
 my_fake_packet = SimulatorObjects()
@@ -70,7 +71,7 @@ def send_telemetry():
 
     print("Sending packet:", packet_string)
 
-    My_device.send_data(receiver, packet_string)
+    My_device.send_data_async(receiver, packet_string)
 
 
 
@@ -83,12 +84,12 @@ def callback_function(xbee_message):
         data = line.split(',')
         
         print("Received packet:", data)
-        if len(data) < 3:
+        
+        if len(data) < 2:
             print("Invalid command packet")
             return
-        
-        
-        
+    
+
         #Validation of command, ensuring it was our packet that we sent via ground station
         if data[0] != str(my_fake_packet.TEAM_ID):
             print("Packet not for this team")
@@ -96,6 +97,10 @@ def callback_function(xbee_message):
         
         cmd  = data[1]
         if cmd == "SIM":
+            
+            if len(data) < 3:
+                print("SIM command missing argument")
+                return
 
             if data[2] == "ENABLE":
                 my_fake_packet.CMD_ECHO = "SIM ENABLE"
@@ -105,6 +110,18 @@ def callback_function(xbee_message):
 
             elif data[2] == "DISABLE":
                 my_fake_packet.CMD_ECHO = "SIM DISABLE"
+
+        elif cmd == "CXOFF":
+            my_fake_packet.TX_ENABLED = False
+            my_fake_packet.CMD_ECHO = "CXOFF"
+        
+        elif cmd == "CXON":
+            my_fake_packet.TX_ENABLED = True
+            my_fake_packet.CMD_ECHO = "CXON"
+        
+        else:
+            print("Unknown command:", cmd)
+            return
 
         print("Command processed:", my_fake_packet.CMD_ECHO)
     except Exception as e:
@@ -116,7 +133,7 @@ def callback_function(xbee_message):
 
 #Xbee Setup
 
-My_device = XBeeDevice("COM3", 9600)
+My_device = XBeeDevice("COM4", 921600)
 receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A20041E060DA"), local_xbee=My_device)
 
 try:
@@ -133,8 +150,11 @@ while True:
     
     
     #Sending Fake Packet to the Radio
-    send_telemetry()
-
+    if getattr(my_fake_packet, "TX_ENABLED", True):
+        send_telemetry()
+    else:
+        print("Telemetry paused (CXOFF)")
+    
     time.sleep(1)
 
     
