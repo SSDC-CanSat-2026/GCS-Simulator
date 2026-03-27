@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import random
 import time
 from threading import Thread
-from datetime import datetime
+from datetime import datetime, timezone
 from digi.xbee.devices import XBeeDevice, RemoteXBeeDevice, XBee64BitAddress
 import csv
 
@@ -41,7 +41,8 @@ my_fake_packet = SimulatorObjects()
 def randomize():
         my_fake_packet.PACKET_COUNT += 1
         my_fake_packet.MISSION_TIME = datetime.now().strftime("%H:%M:%S")
-        my_fake_packet.GPS_TIME = datetime.now().strftime("%H:%M:%S")
+        utc_now = datetime.now(timezone.utc)
+        my_fake_packet.GPS_TIME = utc_now.strftime("%H:%M:%S")
 
         my_fake_packet.ALTITUDE = round(random.uniform(0, 1000),1)
         my_fake_packet.TEMPERATURE = round(random.uniform(-10, 40),1)
@@ -91,33 +92,71 @@ def callback_function(xbee_message):
     
 
         #Validation of command, ensuring it was our packet that we sent via ground station
-        if data[0] != str(my_fake_packet.TEAM_ID):
+        if data[1] != str(my_fake_packet.TEAM_ID):
             print("Packet not for this team")
             return
         
-        cmd  = data[1]
+        cmd  = data[2]
+
+        if data[0] != "CMD":
+            print("Invalid command prefix")
+            return
+
+
+
         if cmd == "SIM":
             
             if len(data) < 3:
                 print("SIM command missing argument")
                 return
 
-            if data[2] == "ENABLE":
+            if data[3] == "ENABLE":
                 my_fake_packet.CMD_ECHO = "SIM ENABLE"
 
-            elif data[2] == "ACTIVATE":
+            elif data[3] == "ACTIVATE":
                 my_fake_packet.CMD_ECHO = "SIM ACTIVATE"
 
-            elif data[2] == "DISABLE":
+            elif data[3] == "DISABLE":
                 my_fake_packet.CMD_ECHO = "SIM DISABLE"
 
-        elif cmd == "CXOFF":
-            my_fake_packet.TX_ENABLED = False
-            my_fake_packet.CMD_ECHO = "CXOFF"
+        elif cmd == "CX":
+            if data[3] == "ON":
+                my_fake_packet.TX_ENABLED = True
+                my_fake_packet.CMD_ECHO = "CXON"
+                
+            elif data[3] == "OFF":
+                my_fake_packet.TX_ENABLED = False
+                my_fake_packet.CMD_ECHO = "CXOFF"
         
-        elif cmd == "CXON":
-            my_fake_packet.TX_ENABLED = True
-            my_fake_packet.CMD_ECHO = "CXON"
+        elif cmd == "ST":
+            time_arg = data[3]
+
+            if time_arg == "GPS":
+               
+                utc_now = datetime.now(timezone.utc)
+                my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
+                my_fake_packet.CMD_ECHO = "ST GPS"
+
+            else:
+                
+                try:
+                    datetime.strptime(time_arg, "%H:%M:%S")
+                    my_fake_packet.MISSION_TIME = time_arg
+                    my_fake_packet.CMD_ECHO = f"ST {time_arg}"
+                except ValueError:
+                    print("Invalid time format for ST command")
+        
+        elif cmd == "SIMP":
+            try:
+                pressure_input = data[3]
+                my_fake_packet.PRESSURE = pressure_input
+            except (ValueError, IndexError):
+                print("Invalid Simulation Command Format")
+        
+        elif cmd == "CAL":
+            my_fake_packet.ALTITUDE = 0
+
+        
         
         else:
             print("Unknown command:", cmd)
@@ -133,8 +172,8 @@ def callback_function(xbee_message):
 
 #Xbee Setup
 
-My_device = XBeeDevice("COM4", 921600)
-receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A20041E060DA"), local_xbee=My_device)
+My_device = XBeeDevice("COM3", 921600)
+receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200420108EB"), local_xbee=My_device)
 
 try:
     My_device.open()
