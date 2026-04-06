@@ -84,7 +84,7 @@ def callback_function(xbee_message):
         line = raw_bytes.decode('utf-8').strip()
         data = line.split(',')
         
-        print("Received packet:", data)
+        print("Received packet:", line)
         
         if len(data) < 2:
             print("Invalid command packet")
@@ -92,14 +92,16 @@ def callback_function(xbee_message):
     
 
         #Validation of command, ensuring it was our packet that we sent via ground station
-        if data[1] != str(my_fake_packet.TEAM_ID):
-            print("Packet not for this team")
-            return
+        
         
         cmd  = data[2]
 
         if data[0] != "CMD":
             print("Invalid command prefix")
+            return
+        
+        if data[1] != str(my_fake_packet.TEAM_ID):
+            print("Packet not for this team")
             return
 
 
@@ -172,8 +174,8 @@ def callback_function(xbee_message):
 
 #Xbee Setup
 
-My_device = XBeeDevice("COM3", 921600)
-receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200420108EB"), local_xbee=My_device)
+My_device = XBeeDevice("COM5", 921600)
+receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200423D8F47"), local_xbee=My_device)
 
 try:
     My_device.open()
