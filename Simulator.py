@@ -84,7 +84,7 @@ def callback_function(xbee_message):
         line = raw_bytes.decode('utf-8').strip()
         data = line.split(',')
         
-        print("Received packet:", line)
+        print("Received packet:", data)
         
         if len(data) < 2:
             print("Invalid command packet")
@@ -196,7 +196,7 @@ while True:
     else:
         print("Telemetry paused (CXOFF)")
     
-    time.sleep(1)
+    time.sleep(50)
 
     
 
