@@ -151,7 +151,10 @@ def callback_function(xbee_message):
         elif cmd == "SIMP":
             try:
                 pressure_input = data[3]
+                print(f"Received SIMP Value{pressure_input}")
                 my_fake_packet.PRESSURE = pressure_input
+                my_fake_packet.CMD_ECHO = " SIMP_Updated"
+                
             except (ValueError, IndexError):
                 print("Invalid Simulation Command Format")
         
@@ -174,7 +177,7 @@ def callback_function(xbee_message):
 
 #Xbee Setup
 
-My_device = XBeeDevice("COM5", 921600)
+My_device = XBeeDevice("COM6", 9600)
 receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200423D8F47"), local_xbee=My_device)
 
 try:
@@ -196,7 +199,7 @@ while True:
     else:
         print("Telemetry paused (CXOFF)")
     
-    time.sleep(50)
+    time.sleep(1)
 
     
 
