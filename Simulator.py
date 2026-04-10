@@ -44,7 +44,7 @@ def randomize():
         utc_now = datetime.now(timezone.utc)
         my_fake_packet.GPS_TIME = utc_now.strftime("%H:%M:%S")
 
-        my_fake_packet.ALTITUDE = round(random.uniform(0, 1000),1)
+        my_fake_packet.ALTITUDE += 1
         my_fake_packet.TEMPERATURE = round(random.uniform(-10, 40),1)
         my_fake_packet.PRESSURE = round(random.uniform(900, 1100),1)
         my_fake_packet.VOLTAGE = round(random.uniform(7.0, 12.6),1)
@@ -55,7 +55,7 @@ def randomize():
         my_fake_packet.ACCEL_R = round(random.uniform(-10, 10),1)
         my_fake_packet.ACCEL_P = round(random.uniform(-10, 10),1)
         my_fake_packet.ACCEL_Y = round(random.uniform(-10, 10),1)
-        my_fake_packet.GPS_ALTITUDE = round(random.uniform(0, 1000),1)
+        my_fake_packet.GPS_ALTITUDE += 1
         my_fake_packet.GPS_LATITUDE = round(random.uniform(-90, 90),4)
         my_fake_packet.GPS_LONGITUDE = round(random.uniform(-180, 180),4)
         my_fake_packet.GPS_SATS = round(random.randint(0, 12),1)
@@ -160,6 +160,9 @@ def callback_function(xbee_message):
         
         elif cmd == "CAL":
             my_fake_packet.ALTITUDE = 0
+            my_fake_packet.GPS_ALTITUDE = 0
+            print("Recieved Cal Input")
+            my_fake_packet.CMD_ECHO = "Cal Reset to 0"
 
         
         
