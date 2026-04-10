@@ -137,14 +137,14 @@ def callback_function(xbee_message):
                
                 utc_now = datetime.now(timezone.utc)
                 my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
-                my_fake_packet.CMD_ECHO = "ST GPS"
+                my_fake_packet.CMD_ECHO = "ST_GPS"
 
             else:
                 
                 try:
                     datetime.strptime(time_arg, "%H:%M:%S")
                     my_fake_packet.MISSION_TIME = time_arg
-                    my_fake_packet.CMD_ECHO = f"ST {time_arg}"
+                    my_fake_packet.CMD_ECHO = "ST"
                 except ValueError:
                     print("Invalid time format for ST command")
         
@@ -153,7 +153,7 @@ def callback_function(xbee_message):
                 pressure_input = data[3]
                 print(f"Received SIMP Value{pressure_input}")
                 my_fake_packet.PRESSURE = pressure_input
-                my_fake_packet.CMD_ECHO = " SIMP_Updated"
+                my_fake_packet.CMD_ECHO = "SIMP"
                 
             except (ValueError, IndexError):
                 print("Invalid Simulation Command Format")
@@ -162,7 +162,7 @@ def callback_function(xbee_message):
             my_fake_packet.ALTITUDE = 0
             my_fake_packet.GPS_ALTITUDE = 0
             print("Recieved Cal Input")
-            my_fake_packet.CMD_ECHO = "Cal Reset to 0"
+            my_fake_packet.CMD_ECHO = "Cal"
 
         
         
