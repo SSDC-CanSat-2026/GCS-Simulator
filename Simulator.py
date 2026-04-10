@@ -161,8 +161,8 @@ def callback_function(xbee_message):
         elif cmd == "CAL":
             my_fake_packet.ALTITUDE = 0
             my_fake_packet.GPS_ALTITUDE = 0
-            print("Recieved Cal Input")
-            my_fake_packet.CMD_ECHO = "Cal"
+            print("Recieved CAL Input")
+            my_fake_packet.CMD_ECHO = "CAL"
 
         
         
