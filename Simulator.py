@@ -41,7 +41,6 @@ my_fake_packet = SimulatorObjects()
 
 def randomize():
         my_fake_packet.PACKET_COUNT += 1
-        my_fake_packet.MISSION_TIME = datetime.now().strftime("%H:%M:%S")
         utc_now = datetime.now(timezone.utc)
         my_fake_packet.GPS_TIME = utc_now.strftime("%H:%M:%S")
 
