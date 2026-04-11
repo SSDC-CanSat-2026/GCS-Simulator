@@ -34,6 +34,7 @@ class SimulatorObjects:
     GPS_SATS = 0
     CMD_ECHO = "CXON"
     TX_ENABLED = True
+    TIME_MODE = "LOCAL"
 
    
 my_fake_packet = SimulatorObjects()
@@ -43,6 +44,13 @@ def randomize():
         my_fake_packet.PACKET_COUNT += 1
         utc_now = datetime.now(timezone.utc)
         my_fake_packet.GPS_TIME = utc_now.strftime("%H:%M:%S")
+        if my_fake_packet.TIME_MODE == "UTC":
+            my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
+        else:
+            local_now = datetime.now()
+            my_fake_packet.MISSION_TIME = local_now.strftime("%H:%M:%S")
+
+
 
         my_fake_packet.ALTITUDE += 1
         my_fake_packet.TEMPERATURE = round(random.uniform(-10, 40),1)
@@ -134,17 +142,14 @@ def callback_function(xbee_message):
             time_arg = data[3]
 
             if time_arg == "GPS":
-                local_now = datetime.now()
-                my_fake_packet.MISSION_TIME = local_now.strftime("%H:%M:%S")
+                my_fake_packet.TIME_MODE = "LOCAL"
                 my_fake_packet.CMD_ECHO = "ST_GPS"
 
             else:
                 
                 try:
                     
-                    utc_now = datetime.now(timezone.utc)
-
-                    my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
+                    my_fake_packet.TIME_MODE = "UTC"
                     my_fake_packet.CMD_ECHO = "ST"
                 except ValueError:
                     print("Invalid time format for ST command")
