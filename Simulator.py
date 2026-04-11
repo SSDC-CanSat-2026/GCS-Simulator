@@ -134,14 +134,16 @@ def callback_function(xbee_message):
             time_arg = data[3]
 
             if time_arg == "GPS":
-                datetime.strptime(time_arg, "%H:%M:%S")
-                my_fake_packet.MISSION_TIME = time_arg
+                local_now = datetime.now()
+                my_fake_packet.MISSION_TIME = local_now.strftime("%H:%M:%S")
                 my_fake_packet.CMD_ECHO = "ST_GPS"
 
             else:
                 
                 try:
-                    utc_now = datetime.now(timezone.utc)
+                    local_now = datetime.now().astimezone()   
+                    utc_now = local_now.astimezone(timezone.utc)
+
                     my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
                     my_fake_packet.CMD_ECHO = "ST"
                 except ValueError:
