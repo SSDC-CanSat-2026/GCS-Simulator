@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import random
 import time
+from zoneinfo import ZoneInfo
 from threading import Thread
 from datetime import datetime, timezone
 from digi.xbee.devices import XBeeDevice, RemoteXBeeDevice, XBee64BitAddress
@@ -141,6 +142,7 @@ def callback_function(xbee_message):
             else:
                 
                 try:
+                    
                     local_now = datetime.now(ZoneInfo("America/New_York"))
                     utc_now = local_now.astimezone(timezone.utc)
 
