@@ -143,8 +143,7 @@ def callback_function(xbee_message):
                 
                 try:
                     
-                    local_now = datetime.now(timezone.utc)
-                    utc_now = local_now.astimezone(timezone.utc)
+                    utc_now = datetime.now(timezone.utc)
 
                     my_fake_packet.MISSION_TIME = utc_now.strftime("%H:%M:%S")
                     my_fake_packet.CMD_ECHO = "ST"
