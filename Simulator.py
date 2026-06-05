@@ -121,13 +121,15 @@ def callback_function(xbee_message):
                 return
 
             if data[3] == "ENABLE":
-                my_fake_packet.CMD_ECHO = "SIM ENABLE"
+                my_fake_packet.CMD_ECHO = "SIMENABLE"
 
             elif data[3] == "ACTIVATE":
-                my_fake_packet.CMD_ECHO = "SIM ACTIVATE"
+                my_fake_packet.CMD_ECHO = "SIMACT"
+                my_fake_packet.MODE = "S"
 
             elif data[3] == "DISABLE":
-                my_fake_packet.CMD_ECHO = "SIM DISABLE"
+                my_fake_packet.CMD_ECHO = "SIMDIS"
+                my_fake_packet.MODE = "F"
 
         elif cmd == "CX":
             if data[3] == "ON":
@@ -186,7 +188,7 @@ def callback_function(xbee_message):
 
 #Xbee Setup
 
-My_device = XBeeDevice("COM6", 9600)
+My_device = XBeeDevice("/dev/tty.usbserial-B0025AKB", 9600)
 receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200425E92E9"), local_xbee=My_device)
 
 try:
