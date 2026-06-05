@@ -187,7 +187,7 @@ def callback_function(xbee_message):
 #Xbee Setup
 
 My_device = XBeeDevice("COM6", 9600)
-receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200423D8F47"), local_xbee=My_device)
+receiver = RemoteXBeeDevice(x64bit_addr=XBee64BitAddress.from_hex_string("0013A200425E92E9"), local_xbee=My_device)
 
 try:
     My_device.open()
